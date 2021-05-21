@@ -1,0 +1,12 @@
+- name: WRONG_INDENTATION
+  enabled: true
+  configuration:
+    newlineAtEnd: true
+    extendedIndentOfParameters: true
+    alignedParameters: true
+    extendedIndentAfterOperators: true
+    indentationSize: 2
+- name: EMPTY_BLOCK_STRUCTURE_ERROR
+  enabled: true
+  configuration:
+    allowEmptyBlocks: true
