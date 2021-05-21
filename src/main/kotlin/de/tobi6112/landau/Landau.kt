@@ -41,8 +41,8 @@ class Landau : CliktCommand() {
     }
 
     client.on(ReadyEvent::class.java)
-      .doOnNext { logger.info { "${applicationInfo.name} is ready..." } }
-      .blockFirst()
+        .doOnNext { logger.info { "${applicationInfo.name} is ready..." } }
+        .blockFirst()
 
     client.onDisconnect().block()
     logger.info { "Shutting down..." }
