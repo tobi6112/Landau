@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import discord4j.core.DiscordClient
+import discord4j.core.event.domain.lifecycle.ReadyEvent
 import discord4j.rest.util.AllowedMentions
 import mu.KotlinLogging
 import kotlin.system.exitProcess
@@ -36,8 +37,12 @@ class Landau : CliktCommand() {
     val applicationInfo = client.applicationInfo.block()
     logger.info {
       val owner = applicationInfo.owner.block()
-      "Starting ${applicationInfo.name} by ${owner.username + "#" + owner.discriminator}"
+      "Started ${applicationInfo.name} by ${owner.username + "#" + owner.discriminator}"
     }
+
+    client.on(ReadyEvent::class.java)
+      .doOnNext { logger.info { "${applicationInfo.name} is ready..." } }
+      .blockFirst()
 
     client.onDisconnect().block()
     logger.info { "Shutting down..." }
