@@ -4,6 +4,8 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
+import de.tobi6112.landau.command.Command
+import de.tobi6112.landau.command.InfoCommand
 import de.tobi6112.landau.config.Configuration
 import discord4j.core.DiscordClient
 import discord4j.core.event.domain.lifecycle.ReadyEvent
@@ -45,6 +47,9 @@ class Landau : CliktCommand() {
       "Started ${applicationInfo.name} by ${owner.username + "#" + owner.discriminator}"
     }
 
+    // TODO temporalgo
+    val commands: Map<String, Command> = mapOf(Pair("info", InfoCommand(applicationInfo)))
+
     client.on(ReadyEvent::class.java)
         .doOnNext { logger.info { "${applicationInfo.name} is ready..." } }
         .blockFirst()
@@ -54,8 +59,8 @@ class Landau : CliktCommand() {
           val prefix = config.bot.command.prefix
           val message = event.message.content.trim().split("\\s+".toRegex())[0]
           if (message.startsWith(prefix) && message.length > prefix.length) {
-            val command = message.substringAfter(prefix)
-            logger.info { "Detected $command command" }
+            val command = commands[message.substringAfter(prefix)]
+            command?.run(event)
           }
         }
 
