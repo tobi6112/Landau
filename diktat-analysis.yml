@@ -10,3 +10,5 @@
   enabled: true
   configuration:
     allowEmptyBlocks: true
+- name: TOO_LONG_FUNCTION
+  enabled: false
