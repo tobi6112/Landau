@@ -1,0 +1,55 @@
+plugins {
+	id 'org.jetbrains.kotlin.jvm' version '1.5.0'
+	id 'idea'
+	id 'com.diffplug.spotless' version '5.12.5'
+}
+
+group = 'de.tobi6112'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+	implementation 'com.github.ajalt.clikt:clikt:3.2.0'
+	implementation 'com.discord4j:discord4j-core:3.1.5'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+compileKotlin {
+	kotlinOptions.jvmTarget = '11'
+}
+
+compileTestKotlin {
+	kotlinOptions.jvmTarget = '11'
+}
+
+idea {
+	module {
+		downloadJavadoc = true
+		downloadSources = true
+	}
+}
+
+spotless {
+	/*ratchetFrom 'origin/main'*/
+
+	format 'misc', {
+		target '*.gradle', '*.md', '.gitignore'
+
+		trimTrailingWhitespace()
+		indentWithTabs()
+		endWithNewline()
+	}
+
+	kotlin {
+		diktat('0.5.3')
+	}
+}
