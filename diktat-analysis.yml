@@ -12,3 +12,5 @@
     allowEmptyBlocks: true
 - name: TOO_LONG_FUNCTION
   enabled: false
+- name: LONG_LINE
+  enabled: false
