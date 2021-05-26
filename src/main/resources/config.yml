@@ -2,7 +2,7 @@ bot:
   commands:
     global:
       info:
-        enabled: true
+        enabled: false
     guilds:
       624931933758947335:
         info:
