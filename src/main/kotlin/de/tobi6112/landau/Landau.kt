@@ -7,9 +7,9 @@ import com.github.ajalt.clikt.parameters.options.required
 import de.tobi6112.landau.command.Command
 import de.tobi6112.landau.command.InfoCommand
 import de.tobi6112.landau.config.Configuration
+import de.tobi6112.landau.service.ApplicationCommandService
 import discord4j.core.DiscordClient
 import discord4j.core.event.domain.lifecycle.ReadyEvent
-import discord4j.core.event.domain.message.MessageCreateEvent
 import discord4j.rest.util.AllowedMentions
 import mu.KotlinLogging
 import kotlin.system.exitProcess
@@ -24,6 +24,9 @@ class Landau : CliktCommand() {
   private val token by option("-t", "--token", help = "Bot token", envvar = "LANDAU_BOT_TOKEN").required()
   private val configEnv by option("-c", "--config", help = "Configuration environment")
   private val systemProperties: Map<String, String> by option("-D").associate()
+
+  // TODO temporary solution
+  private val applicationCommands: Iterable<Command> = listOf(InfoCommand())
 
   @Suppress("MAGIC_NUMBER")
   override fun run() {
@@ -47,22 +50,15 @@ class Landau : CliktCommand() {
       "Started ${applicationInfo.name} by ${owner.username + "#" + owner.discriminator}"
     }
 
-    // TODO temporalgo
-    val commands: Map<String, Command> = mapOf(Pair("info", InfoCommand(applicationInfo)))
-
     client.on(ReadyEvent::class.java)
-        .doOnNext { logger.info { "${applicationInfo.name} is ready..." } }
+        .doOnNext {
+          logger.info { "${applicationInfo.name} is ready..." }
+        }
         .blockFirst()
 
-    client.on(MessageCreateEvent::class.java)
-        .subscribe { event ->
-          val prefix = config.bot.command.prefix
-          val message = event.message.content.trim().split("\\s+".toRegex())[0]
-          if (message.startsWith(prefix) && message.length > prefix.length) {
-            val command = commands[message.substringAfter(prefix)]
-            command?.run(event)
-          }
-        }
+    // Register all applicationCommands
+    val applicationCommandService = ApplicationCommandService(applicationInfo, client.restClient.applicationService)
+    applicationCommandService.createCommands(applicationCommands, config.bot.commands)
 
     client.onDisconnect().block()
     logger.info { "Shutting down..." }

@@ -1,3 +1,9 @@
 bot:
-  command:
-    prefix: .
+  commands:
+    global:
+      info:
+        enabled: true
+    guilds:
+      624931933758947335:
+        info:
+          enabled: true

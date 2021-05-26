@@ -1,19 +1,15 @@
 package de.tobi6112.landau.command
 
-import discord4j.core.event.domain.message.MessageCreateEvent
-
 /**
- * Command
+ * Abstract command
  *
- * @constructor Nothing
+ * @constructor
+ * notingham
  *
- * @param command Command name
+ * @param name name of the command
+ * @param description description
+ * @property name
+ * @property description
  */
-abstract class Command(command: String) {
-  /**
-   * Run command
-   *
-   * @param event event
-   */
-  abstract fun run(event: MessageCreateEvent)
+abstract class Command(val name: String, val description: String) {
 }
