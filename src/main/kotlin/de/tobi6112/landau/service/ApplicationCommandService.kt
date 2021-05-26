@@ -33,7 +33,7 @@ class ApplicationCommandService(
 
     // Get guild enabled commands
     val guildEnabledCommands =
-        config.guilds.mapValues { (guildId, cmdCfg) ->
+        config.guilds.mapValues { (_, cmdCfg) ->
           commands.filter { cmdCfg[it.name]?.enabled ?: true }
         }
     guildEnabledCommands.forEach { createGuildCommands(it.key, it.value) }
