@@ -63,7 +63,8 @@ class Landau : CliktCommand() {
     // Register all applicationCommands
     val applicationCommandService =
         ApplicationCommandService(applicationInfo!!, client.restClient.applicationService)
-    applicationCommandService.createCommands(applicationCommands, config.bot.commands)
+    val commands =
+        applicationCommandService.createCommands(applicationCommands, config.bot.commands)
 
     client
         .eventDispatcher
