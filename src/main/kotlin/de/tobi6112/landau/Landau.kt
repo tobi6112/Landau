@@ -9,6 +9,7 @@ import de.tobi6112.landau.command.InfoCommand
 import de.tobi6112.landau.config.Configuration
 import de.tobi6112.landau.service.ApplicationCommandService
 import discord4j.core.DiscordClient
+import discord4j.core.event.domain.InteractionCreateEvent
 import discord4j.core.event.domain.lifecycle.ReadyEvent
 import discord4j.rest.util.AllowedMentions
 import mu.KotlinLogging
@@ -42,21 +43,35 @@ class Landau : CliktCommand() {
             .login()
             .block()
 
-    val applicationInfo = client.applicationInfo.block()
-    logger.info {
-      val owner = applicationInfo.owner.block()
-      "Started ${applicationInfo.name} by ${owner.username + "#" + owner.discriminator}"
-    }
+    val applicationInfo =
+        client!!
+            .applicationInfo
+            .doOnSuccess { info ->
+              logger.info {
+                val owner = info.owner.block()!!
+                "Started ${info.name} by ${owner.username + "#" + owner.discriminator}"
+              }
+            }
+            .doOnError { err -> logger.error(err) { "Could not get ApplicationInfo" } }
+            .block()
 
     client
         .on(ReadyEvent::class.java)
-        .doOnNext { logger.info { "${applicationInfo.name} is ready..." } }
+        .doOnNext { logger.info { "${applicationInfo!!.name} is ready..." } }
         .blockFirst()
 
     // Register all applicationCommands
     val applicationCommandService =
-        ApplicationCommandService(applicationInfo, client.restClient.applicationService)
+        ApplicationCommandService(applicationInfo!!, client.restClient.applicationService)
     applicationCommandService.createCommands(applicationCommands, config.bot.commands)
+
+    client
+        .eventDispatcher
+        .on(InteractionCreateEvent::class.java)
+        .doOnNext { event -> logger.debug { "Received interaction ${event.commandName}" } }
+        .doOnNext { event -> event.acknowledge() }
+        .flatMap { event -> event.reply("Hello") }
+        .subscribe()
 
     client.onDisconnect().block()
     logger.info { "Shutting down..." }
