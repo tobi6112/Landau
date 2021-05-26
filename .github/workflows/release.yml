@@ -34,17 +34,15 @@ jobs:
       run: |
         echo "IMAGE_NAME=docker.pkg.github.com/tobi6112/landau/landau:${{ env.RELEASE_VERSION }}" >> $GITHUB_ENV
     
-    - name: LS
-      run: |
-        ls -a
+    - name: setup pack
+      uses: andrioid/setup-pack@v1.0.1
+      with:
+        pack-version: 0.18.1
     
     - name: Pack Build
-      uses: dfreilich/pack-action@v1
-      with:
-        args: 'build ${{ env.IMAGE_NAME }} -v --builder paketobuildpacks/builder:base --buildpack gcr.io/paketo-buildpacks/gradle --path /github/workspace/ --publish'
-        registry: 'https://docker.pkg.github.com'
-        username: tobi6112
-        password:  ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login -u tobi6112 --password-stdin 'https://docker.pkg.github.com'
+        pack build ${{ env.IMAGE_NAME }} -v --builder paketobuildpacks/builder:base --buildpack gcr.io/paketo-buildpacks/gradle --publish
 
     - name: Release with Gradle
       id: release
