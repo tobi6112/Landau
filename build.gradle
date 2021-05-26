@@ -5,24 +5,34 @@ plugins {
 }
 
 group = 'de.tobi6112'
-version = '0.0.1-SNAPSHOT'
+version = '0.1.0-SNAPSHOT'
 
 repositories {
   mavenCentral()
 }
 
+ext {
+  slf4jVersion = '1.7.30'
+  hopliteVersion = '1.4.1'
+  discord4jVersion = '3.1.5'
+  junitVersion = '5.6.0'
+}
+
 dependencies {
-  testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
   implementation 'com.github.ajalt.clikt:clikt:3.2.0'
-  implementation 'com.discord4j:discord4j-core:3.1.5'
+  implementation "com.discord4j:discord4j-core:$discord4jVersion"
   implementation 'io.github.microutils:kotlin-logging-jvm:2.0.6'
-  runtimeOnly 'org.slf4j:slf4j-api:1.7.30'
-  runtimeOnly 'org.slf4j:slf4j-simple:1.7.30'
-  implementation 'com.sksamuel.hoplite:hoplite-core:1.4.1'
-  implementation 'com.sksamuel.hoplite:hoplite-yaml:1.4.1'
+  implementation "com.sksamuel.hoplite:hoplite-core:$hopliteVersion"
+  implementation "com.sksamuel.hoplite:hoplite-yaml:$hopliteVersion"
   implementation 'io.projectreactor:reactor-tools'
+
+  runtimeOnly "org.slf4j:slf4j-api:$slf4jVersion"
+  runtimeOnly "org.slf4j:slf4j-simple:$slf4jVersion"
+
+  testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+  testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+
+  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 }
 
 test {
@@ -51,6 +61,20 @@ jar {
   from {
     configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
   }
+}
+
+task createProperties(dependsOn: processResources) {
+  doLast {
+    new File("$buildDir/resources/main/version.properties").withWriter { w ->
+      Properties p = new Properties()
+      p['version'] = project.version.toString()
+      p.store w, null
+    }
+  }
+}
+
+classes {
+  dependsOn createProperties
 }
 
 spotless {
