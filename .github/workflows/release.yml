@@ -42,11 +42,11 @@ jobs:
     - name: Pack Build
       run: |
         echo ${{ secrets.GITHUB_TOKEN }} | docker login -u tobi6112 --password-stdin 'https://docker.pkg.github.com'
-        pack build ${{ env.IMAGE_NAME }} -v --builder paketobuildpacks/builder:base --buildpack gcr.io/paketo-buildpacks/java --publish
+        pack build ${{ env.IMAGE_NAME }} --builder paketobuildpacks/builder:base --buildpack gcr.io/paketo-buildpacks/java --publish
 
     - name: Release with Gradle
       id: release
       run: |
-        ./gradlew release -Prelease.useAutomaticVersion=true \
+        ./gradlew release --no-daemon -Prelease.useAutomaticVersion=true \
         -Prelease.releaseVersion=${{ env.RELEASE_VERSION }} \
         -Prelease.newVersion=${{ env.NEXT_VERSION }}
