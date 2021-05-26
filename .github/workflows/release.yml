@@ -27,9 +27,8 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Build
-      run: |
-        ./gradlew build
+    - name: Setup git user
+      uses: fregante/setup-git-user@v1
 
     - name: Release with Gradle
       id: release
