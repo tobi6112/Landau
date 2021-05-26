@@ -64,6 +64,7 @@ spotless {
   }
 
   kotlin {
+    ktfmt()
     diktat('0.5.3').configFile("diktat-analysis.yml")
   }
 }
