@@ -69,8 +69,8 @@ class InfoCommand(
   }
 
   private fun getBotInfo(event: InteractionCreateEvent) =
-      event.reply { event ->
-        event.addEmbed { embed ->
+      event.reply { ev ->
+        ev.addEmbed { embed ->
           embed
               .setTitle("Information")
               .setColor(Color.SEA_GREEN)
@@ -83,7 +83,7 @@ class InfoCommand(
       }
 
   private fun getServerInfo(event: InteractionCreateEvent): Mono<Void> {
-    val guild = event.interaction.guild.block()
+    val guild = event.interaction.guild.block()!!
     return event.reply { interaction ->
       interaction.addEmbed { embed ->
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault())
@@ -99,7 +99,7 @@ class InfoCommand(
 
   private fun loadVersion(): String {
     val prop = Properties()
-    prop.load(this::class.java.getResource("/version.properties").openStream())
+    prop.load(this::class.java.getResource("/version.properties")!!.openStream())
     return prop.getProperty("version")!!
   }
 }

@@ -64,7 +64,7 @@ class ApplicationCommandService(
               .doOnSuccess { logger.info { "Successfully created global command $it" } }
               .block()
 
-      map[res.id().toLong()] = it
+      map[res!!.id().toLong()] = it
     }
 
     return map
@@ -92,7 +92,7 @@ class ApplicationCommandService(
               }
               .block()
 
-      map[res.id().toLong()] = command
+      map[res!!.id().toLong()] = command
     }
 
     return map
