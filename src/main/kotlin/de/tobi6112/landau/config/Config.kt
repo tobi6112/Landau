@@ -1,6 +1,4 @@
-/**
- * Contains configuration schemas and Configuration related files
- */
+/** Contains configuration schemas and Configuration related files */
 
 package de.tobi6112.landau.config
 
@@ -9,6 +7,7 @@ import com.sksamuel.hoplite.EnvironmentVariablesPropertySource
 import com.sksamuel.hoplite.PropertySource
 
 typealias GuildsCommandConfig = Map<Long, Map<String, CommandConfig>>
+
 typealias GlobalCommandsConfig = Map<String, CommandConfig>
 
 /**
@@ -40,9 +39,7 @@ data class BotConfig(val commands: CommandsConfig)
  */
 data class Config(val bot: BotConfig)
 
-/**
- * Configuration object, used to retrieve configuration file
- */
+/** Configuration object, used to retrieve configuration file */
 object Configuration {
   /**
    * Get configuration
@@ -51,12 +48,7 @@ object Configuration {
    * @return Config
    */
   fun getConfig(env: String?): Config {
-    val file = env?.let {
-      "/config-$env.yml"
-    }
-        ?: run {
-          "/config.yml"
-        }
+    val file = env?.let { "/config-$env.yml" } ?: run { "/config.yml" }
     return ConfigLoader.Builder()
         .addSource(EnvironmentVariablesPropertySource(true, allowUppercaseNames = true))
         .addSource(PropertySource.resource(file))

@@ -12,16 +12,16 @@ import discord4j.core.DiscordClient
 import discord4j.core.event.domain.lifecycle.ReadyEvent
 import discord4j.rest.util.AllowedMentions
 import mu.KotlinLogging
+
 import kotlin.system.exitProcess
 
-/**
- * Main class of Landau Bot, processes CLI parameters and creates DiscordClient
- */
+/** Main class of Landau Bot, processes CLI parameters and creates DiscordClient */
 class Landau : CliktCommand() {
   private val logger = KotlinLogging.logger {}
 
   // CLI Options
-  private val token by option("-t", "--token", help = "Bot token", envvar = "LANDAU_BOT_TOKEN").required()
+  private val token by option("-t", "--token", help = "Bot token", envvar = "LANDAU_BOT_TOKEN")
+      .required()
   private val configEnv by option("-c", "--config", help = "Configuration environment")
   private val systemProperties: Map<String, String> by option("-D").associate()
 
@@ -31,18 +31,16 @@ class Landau : CliktCommand() {
   @Suppress("MAGIC_NUMBER")
   override fun run() {
     // Set system properties
-    systemProperties.entries.forEach {
-      System.setProperty(it.key, it.value)
-    }
+    systemProperties.entries.forEach { System.setProperty(it.key, it.value) }
 
     val config = Configuration.getConfig(configEnv)
 
-    val client = DiscordClient
-        .builder(token)
-        .setDefaultAllowedMentions(AllowedMentions.suppressEveryone())
-        .build()
-        .login()
-        .block()
+    val client =
+        DiscordClient.builder(token)
+            .setDefaultAllowedMentions(AllowedMentions.suppressEveryone())
+            .build()
+            .login()
+            .block()
 
     val applicationInfo = client.applicationInfo.block()
     logger.info {
@@ -50,14 +48,14 @@ class Landau : CliktCommand() {
       "Started ${applicationInfo.name} by ${owner.username + "#" + owner.discriminator}"
     }
 
-    client.on(ReadyEvent::class.java)
-        .doOnNext {
-          logger.info { "${applicationInfo.name} is ready..." }
-        }
+    client
+        .on(ReadyEvent::class.java)
+        .doOnNext { logger.info { "${applicationInfo.name} is ready..." } }
         .blockFirst()
 
     // Register all applicationCommands
-    val applicationCommandService = ApplicationCommandService(applicationInfo, client.restClient.applicationService)
+    val applicationCommandService =
+        ApplicationCommandService(applicationInfo, client.restClient.applicationService)
     applicationCommandService.createCommands(applicationCommands, config.bot.commands)
 
     client.onDisconnect().block()
