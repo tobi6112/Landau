@@ -4,8 +4,8 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
-import de.tobi6112.landau.command.Command
 import de.tobi6112.landau.command.InfoCommand
+import de.tobi6112.landau.command.core.AbstractCommand
 import de.tobi6112.landau.config.Configuration
 import de.tobi6112.landau.service.ApplicationCommandService
 import discord4j.core.DiscordClient
@@ -27,7 +27,7 @@ class Landau : CliktCommand() {
   private val systemProperties: Map<String, String> by option("-D").associate()
 
   // TODO temporary solution
-  private val applicationCommands: Iterable<Command> = listOf(InfoCommand())
+  private val applicationCommands: Iterable<AbstractCommand> = listOf(InfoCommand())
 
   @Suppress("MAGIC_NUMBER")
   override fun run() {
@@ -70,7 +70,6 @@ class Landau : CliktCommand() {
         .on(InteractionCreateEvent::class.java)
         .doOnNext { event -> logger.debug { "Received interaction ${event.commandName}" } }
         .doOnNext { event -> event.acknowledge() }
-        .flatMap { event -> event.reply("Hello") }
         .subscribe()
 
     client.onDisconnect().block()

@@ -1,9 +1,8 @@
 package de.tobi6112.landau.service
 
-import de.tobi6112.landau.command.Command
+import de.tobi6112.landau.command.core.AbstractCommand
 import de.tobi6112.landau.config.CommandsConfig
 import discord4j.core.`object`.entity.ApplicationInfo
-import discord4j.discordjson.json.ApplicationCommandRequest
 import discord4j.rest.service.ApplicationService
 import mu.KotlinLogging
 
@@ -26,7 +25,7 @@ class ApplicationCommandService(
    * @param commands available commands
    * @param config commands config
    */
-  fun createCommands(commands: Iterable<Command>, config: CommandsConfig) {
+  fun createCommands(commands: Iterable<AbstractCommand>, config: CommandsConfig) {
     // Get global enabled commands
     val globalEnabledCommands = commands.filter { config.global[it.name]?.enabled ?: true }
     createGlobalCommands(globalEnabledCommands)
@@ -39,12 +38,12 @@ class ApplicationCommandService(
     guildEnabledCommands.forEach { createGuildCommands(it.key, it.value) }
   }
 
-  private fun createGlobalCommands(commands: Iterable<Command>) {
+  private fun createGlobalCommands(commands: Iterable<AbstractCommand>) {
     checkMultipleCommands(commands)
 
     // TODO Return Mono
     commands.distinctBy { it.name }.forEach {
-      val request = commandToApplicationCommandRequest(it)
+      val request = it.toRequest()
       this.applicationService
           .createGlobalApplicationCommand(applicationId, request)
           .doOnError { err -> logger.error(err) { "Could not create global command $it" } }
@@ -53,12 +52,12 @@ class ApplicationCommandService(
     }
   }
 
-  private fun createGuildCommands(guildId: Long, commands: Iterable<Command>) {
+  private fun createGuildCommands(guildId: Long, commands: Iterable<AbstractCommand>) {
     checkMultipleCommands(commands)
 
     // TODO Return Mono
     commands.distinctBy { it.name }.forEach { command ->
-      val request = commandToApplicationCommandRequest(command)
+      val request = command.toRequest()
       this.applicationService
           .createGuildApplicationCommand(applicationId, guildId, request)
           .doOnError { err ->
@@ -71,16 +70,10 @@ class ApplicationCommandService(
     }
   }
 
-  private fun checkMultipleCommands(commands: Iterable<Command>) {
+  private fun checkMultipleCommands(commands: Iterable<AbstractCommand>) {
     commands.groupingBy { it.name }.eachCount().filter { it.value > 1 }
         .forEach { (name, count) ->
           logger.warn { "Multiple commands for name $name found ($count times)" }
         }
   }
-
-  private fun commandToApplicationCommandRequest(command: Command) =
-      ApplicationCommandRequest.builder()
-          .name(command.name)
-          .description(command.description)
-          .build()
 }
