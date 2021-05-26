@@ -41,7 +41,7 @@ jobs:
     - name: Pack Build
       uses: dfreilich/pack-action@v1
       with:
-        args: 'build ${{ env.IMAGE_NAME }} -v --builder paketobuildpacks/builder:base --buildpack gcr.io/paketo-buildpacks/gradle --publish'
+        args: 'build ${{ env.IMAGE_NAME }} -v --builder paketobuildpacks/builder:base --buildpack gcr.io/paketo-buildpacks/gradle --path /github/workspace/ --publish'
         registry: 'https://docker.pkg.github.com'
         username: tobi6112
         password:  ${{ secrets.GITHUB_TOKEN }}
