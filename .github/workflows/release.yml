@@ -36,3 +36,19 @@ jobs:
         ./gradlew release -Prelease.useAutomaticVersion=true \
         -Prelease.releaseVersion=${{ env.RELEASE_VERSION }} \
         -Prelease.newVersion=${{ env.NEXT_VERSION }}
+
+    - name: Export version
+      run: |
+        echo "RELEASE_VERSION=(./gradlew properties --no-daemon --console=plain -q | grep "^version:" | awk '{printf $2}')" >> $GITHUB_ENV
+    
+    - name: Export Image name
+      run: |
+        echo "IMAGE_NAME=docker.pkg.github.com/tobi6112/landau/landau:${{ env.RELEASE_VERSION }}" >> $GITHUB_ENV
+    
+    - name: Pack Build
+      uses: dfreilich/pack-action@v1
+      with:
+        args: 'build ${{ env.IMAGE_NAME }} --builder gcr.io/paketo-buildpacks/gradle'
+        registry: 'https://docker.pkg.github.com'
+        username: tobi6112
+        password:  ${{ secrets.GITHUB_TOKEN }}
