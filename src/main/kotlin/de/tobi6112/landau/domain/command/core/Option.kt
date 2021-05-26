@@ -1,4 +1,4 @@
-package de.tobi6112.landau.command.core
+package de.tobi6112.landau.domain.command.core
 
 import discord4j.discordjson.json.ApplicationCommandOptionData
 

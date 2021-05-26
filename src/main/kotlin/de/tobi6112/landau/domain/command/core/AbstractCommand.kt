@@ -1,6 +1,8 @@
-package de.tobi6112.landau.command.core
+package de.tobi6112.landau.domain.command.core
 
+import discord4j.core.event.domain.InteractionCreateEvent
 import discord4j.discordjson.json.ApplicationCommandRequest
+import reactor.core.publisher.Mono
 
 /**
  * Abstract command
@@ -12,7 +14,7 @@ import discord4j.discordjson.json.ApplicationCommandRequest
  * @property name
  * @property description
  */
-open class AbstractCommand(
+abstract class AbstractCommand(
     val name: String,
     private val description: String,
     private val options: List<Option> = listOf()
@@ -24,6 +26,14 @@ open class AbstractCommand(
       "Command description must contain between 1 and 100 characters"
     }
   }
+
+  /**
+   * Handles a interaction event
+   *
+   * @param event Interaction event
+   * @return ?
+   */
+  abstract fun handleEvent(event: InteractionCreateEvent): Mono<*>
 
   /**
    * Convert to Data schema
