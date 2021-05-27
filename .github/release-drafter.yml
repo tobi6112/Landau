@@ -51,4 +51,4 @@ autolabeler:
       - '/feature\/.+/'
   - label: 'skip-changelog'
     files:
-      - '.github/*'
+      - '.github/'
