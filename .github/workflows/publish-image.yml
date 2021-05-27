@@ -1,0 +1,38 @@
+name: Publish image
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  publish-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Generate versions
+        uses: HardNorth/github-version-generate@v1.1.1
+        with:
+          version-source: file
+          version-file: gradle.properties
+          version-file-extraction-pattern: '(?<=version=).+'
+
+      - name: setup pack
+        uses: andrioid/setup-pack@v1.0.1
+        with:
+          pack-version: 0.18.1
+      
+      - name: Repository login
+        env:
+          IMAGE_REPOSITORY: 'https://docker.pkg.github.com'
+          IMAGE_REPOSITORY_USER: tobi6112
+          IMAGE_REPOSITORY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo ${{ env.IMAGE_REPOSITORY_PASSWORD }} | docker login -u tobi6112 --password-stdin 'https://docker.pkg.github.com'
+
+      - name: Pack Build
+        env:
+          IMAGE_NAME: 'docker.pkg.github.com/tobi6112/landau/landau:${{ env.CURRENT_VERSION}}'
+        run: |
+          pack build ${{ env.IMAGE_NAME }} --builder paketobuildpacks/builder:base --buildpack gcr.io/paketo-buildpacks/java --publish
+        
