@@ -80,8 +80,6 @@ classes {
 }
 
 spotless {
-  ratchetFrom 'origin/master'
-
   format 'misc', {
     target '*.gradle', '*.md', '.gitignore'
 
