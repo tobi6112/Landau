@@ -17,6 +17,7 @@ group = 'de.tobi6112'
 
 repositories {
   mavenCentral()
+  jcenter()
 }
 
 ext {
@@ -25,6 +26,7 @@ ext {
   discord4jVersion = '3.1.5'
   junitVersion = '5.7.2'
   kotlinVersion = '1.5.10'
+  kotestVersion = '4.6.0'
 }
 
 dependencies {
@@ -42,6 +44,11 @@ dependencies {
 
   testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
   testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+  testImplementation "io.kotest:kotest-runner-junit5:$kotestVersion"
+  testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
+  testImplementation "io.kotest:kotest-property:$kotestVersion"
+  testImplementation 'org.mockito.kotlin:mockito-kotlin:3.2.0'
+  testImplementation "org.mockito:mockito-core:3.+"
 
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 }

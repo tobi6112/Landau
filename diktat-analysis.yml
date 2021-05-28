@@ -14,3 +14,5 @@
   enabled: false
 - name: LONG_LINE
   enabled: false
+- name: FILE_WILDCARD_IMPORTS
+  enabled: false
