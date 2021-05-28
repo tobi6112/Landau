@@ -3,12 +3,14 @@ package de.tobi6112.landau.util
 import mu.KotlinLogging
 
 import java.lang.management.ManagementFactory
+import javax.management.MBeanServer
 import javax.management.ObjectName
 
 /** Default performance monitor */
-class DefaultPerformanceMonitor : PerformanceMonitor {
+class DefaultPerformanceMonitor(
+    private val mbs: MBeanServer = ManagementFactory.getPlatformMBeanServer()
+) : PerformanceMonitor {
   private val logger = KotlinLogging.logger {}
-  private val mbs = ManagementFactory.getPlatformMBeanServer()
   private val runtime = Runtime.getRuntime()
 
   override fun usedMemory(): Long = this.availableMemory() - this.runtime.freeMemory()
