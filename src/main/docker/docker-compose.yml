@@ -1,0 +1,8 @@
+version: '3.7'
+
+services:
+  landau:
+    image: docker.pkg.github.com/tobi6112/landau/landau:latest
+    container_name: landau
+    env_file:
+      - ../../../.env

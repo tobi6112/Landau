@@ -2,7 +2,16 @@ plugins {
   id 'org.jetbrains.kotlin.jvm' version '1.5.10'
   id 'idea'
   id 'com.diffplug.spotless' version '5.12.5'
+  id 'com.bmuschko.docker-remote-api' version '7.0.0'
+  id 'com.github.johnrengelman.shadow' version '7.0.0'
+  id "com.avast.gradle.docker-compose" version "0.14.3"
 }
+
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
 
 group = 'de.tobi6112'
 
@@ -23,13 +32,13 @@ dependencies {
   implementation "com.discord4j:discord4j-core:$discord4jVersion"
   implementation 'io.github.microutils:kotlin-logging-jvm:2.0.6'
   implementation "com.sksamuel.hoplite:hoplite-core:$hopliteVersion"
-  implementation "com.sksamuel.hoplite:hoplite-yaml:$hopliteVersion"
   implementation 'io.projectreactor:reactor-tools'
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
   runtimeOnly "org.slf4j:slf4j-api:$slf4jVersion"
   runtimeOnly "org.slf4j:slf4j-simple:$slf4jVersion"
+  runtimeOnly "com.sksamuel.hoplite:hoplite-yaml:$hopliteVersion"
 
   testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
   testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
@@ -60,9 +69,15 @@ jar {
   manifest {
     attributes('Main-Class': 'de.tobi6112.landau.LandauKt')
   }
-  from {
-    configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-  }
+}
+
+shadowJar {
+  archiveVersion.set('')
+  mergeServiceFiles()
+}
+
+assemble {
+  dependsOn shadowJar
 }
 
 task createProperties(dependsOn: processResources) {
@@ -93,5 +108,64 @@ spotless {
   kotlin {
     ktfmt()
     diktat('0.5.3').configFile("diktat-analysis.yml")
+  }
+}
+
+task createDockerfile(type: Dockerfile) {
+  onlyIf { !project.file("$buildDir/docker/Dockerfile").exists() }
+  group 'Docker'
+  description 'Generate a Dockerfile for the application if it does not exist'
+  dependsOn shadowJar
+  destFile = project.file("$buildDir/docker/Dockerfile")
+  from('adoptopenjdk:11-jre-hotspot')
+  runCommand('mkdir /app')
+  copyFile("./libs/${shadowJar.archiveFileName.getOrNull()}", '/app/landau.jar')
+  entryPoint('java', '-jar', '/app/landau.jar')
+}
+
+task buildImage(type: DockerBuildImage) {
+  group 'Docker'
+  description 'Build docker image'
+  dependsOn createDockerfile
+  inputDir = file('./build')
+  dockerFile = file("$buildDir/docker/Dockerfile")
+  images.add('docker.pkg.github.com/tobi6112/landau/landau:latest')
+  images.add("docker.pkg.github.com/tobi6112/landau/landau:${project.version}")
+}
+
+task createContainer(type: DockerCreateContainer) {
+  group 'Docker'
+  description 'Create container'
+  dependsOn buildImage
+
+  def map = [:]
+
+  file('.env').readLines().each() {
+    if (!it.isEmpty() && !it.startsWith("#")) {
+      def pos = it.indexOf("=")
+      def key = it.substring(0, pos)
+      def value = it.substring(pos + 1)
+
+      map[key] = value
+    }
+  }
+
+  targetImageId buildImage.getImageId()
+  containerName = project.name.toLowerCase()
+  envVars = map
+  hostConfig.autoRemove = true
+}
+
+task startContainer(type: DockerStartContainer) {
+  group 'Docker'
+  description 'Start container'
+  dependsOn createContainer
+  targetContainerId createContainer.getContainerId()
+}
+
+composeUp {
+  dependsOn buildImage
+  dockerCompose {
+    useComposeFiles = ['src/main/docker/docker-compose.yml']
   }
 }
