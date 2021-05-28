@@ -64,9 +64,21 @@ class Landau : CliktCommand() {
 
     // Register all applicationCommands
     val applicationCommandService =
-        ApplicationCommandService(applicationInfo!!, client.restClient.applicationService)
-    val commands =
-        applicationCommandService.createCommands(applicationCommands, config.bot.commands)
+        ApplicationCommandService(
+            applicationInfo!!, client.restClient.applicationService, config.bot.commands)
+
+    val commands: MutableMap<Long, AbstractCommand> = mutableMapOf()
+
+    applicationCommandService
+        .createCommands(applicationCommands)
+        .doOnNext {
+          if (commands.containsKey(it.first)) {
+            logger.warn { "Command with id ${it.first} already exist" }
+          } else {
+            commands[it.first] = it.second
+          }
+        }
+        .subscribe()
 
     client
         .eventDispatcher
