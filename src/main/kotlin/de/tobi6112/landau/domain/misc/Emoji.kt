@@ -12,9 +12,12 @@ enum class Emoji(private val notation: String) {
   CROWN("crown"),
   BIRTHDAY("birthday"),
   PEOPLE_HUGGING("people_hugging"),
+  GEAR("gear"),
+  ROCKET("rocket"),
+  PARTYING_FACE("partying_face"),
   ;
 
-  private fun toDiscordNotation() = ":$notation:"
+  private fun toDiscordNotation() = DiscordLiterals.EMOJI_LITERAL.buildLiteral(this.notation)
 
   override fun toString() = toDiscordNotation()
 }
