@@ -178,8 +178,8 @@ task pushImage(type: DockerPushImage) {
   images.add("docker.pkg.github.com/tobi6112/landau/landau:${project.version}")
   registryCredentials {
     url = "https://docker.pkg.github.com"
-    username = System.getenv('REGISTY_USERNAME')
-    password = System.getenv('REGISTY_PASSWORD')
+    username = System.getenv('REGISTRY_USERNAME')
+    password = System.getenv('REGISTRY_PASSWORD')
   }
 }
 
