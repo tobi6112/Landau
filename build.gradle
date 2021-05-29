@@ -10,7 +10,7 @@ plugins {
 import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
-import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
+import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
 
 group = 'de.tobi6112'
@@ -170,6 +170,17 @@ task startContainer(type: DockerStartContainer) {
   description 'Start container'
   dependsOn createContainer
   targetContainerId createContainer.getContainerId()
+}
+
+task pushImage(type: DockerPushImage) {
+  dependsOn buildImage
+  images.add('docker.pkg.github.com/tobi6112/landau/landau:latest')
+  images.add("docker.pkg.github.com/tobi6112/landau/landau:${project.version}")
+  registryCredentials {
+    url = "https://docker.pkg.github.com"
+    username = System.getenv('REGISTY_USERNAME')
+    password = System.getenv('REGISTY_PASSWORD')
+  }
 }
 
 composeUp {
