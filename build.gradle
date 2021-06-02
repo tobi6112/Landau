@@ -32,7 +32,7 @@ ext {
 dependencies {
   implementation 'com.github.ajalt.clikt:clikt:3.2.0'
   implementation "com.discord4j:discord4j-core:$discord4jVersion"
-  implementation 'io.github.microutils:kotlin-logging-jvm:2.0.6'
+  implementation 'io.github.microutils:kotlin-logging-jvm:2.0.8'
   implementation "com.sksamuel.hoplite:hoplite-core:$hopliteVersion"
   implementation 'io.projectreactor:reactor-tools'
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
