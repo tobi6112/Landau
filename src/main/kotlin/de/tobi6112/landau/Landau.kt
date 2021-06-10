@@ -5,14 +5,19 @@ import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import de.tobi6112.landau.config.Configuration
-import de.tobi6112.landau.domain.command.InfoCommand
-import de.tobi6112.landau.domain.command.core.AbstractCommand
+import de.tobi6112.landau.domain.connect.ConnectCommand
+import de.tobi6112.landau.domain.connect.ServiceConnectionTable
+import de.tobi6112.landau.domain.core.command.AbstractCommand
+import de.tobi6112.landau.domain.info.InfoCommand
 import de.tobi6112.landau.service.ApplicationCommandService
 import discord4j.core.DiscordClient
 import discord4j.core.event.domain.InteractionCreateEvent
 import discord4j.core.event.domain.lifecycle.ReadyEvent
 import discord4j.rest.util.AllowedMentions
 import mu.KotlinLogging
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.transactions.transaction
 import reactor.core.publisher.Mono
 
 import kotlin.system.exitProcess
@@ -33,6 +38,14 @@ class Landau : CliktCommand() {
     systemProperties.entries.forEach { System.setProperty(it.key, it.value) }
 
     val config = Configuration.getConfig(configEnv)
+
+    Database.connect(
+        url = config.database.jdbcUrl,
+        driver = config.database.driver,
+        user = config.database.username,
+        password = config.database.password)
+
+    transaction { SchemaUtils.createMissingTablesAndColumns(ServiceConnectionTable) }
 
     val client =
         DiscordClient.builder(token)
@@ -55,7 +68,7 @@ class Landau : CliktCommand() {
 
     // TODO temporary solution
     val applicationCommands: Iterable<AbstractCommand> =
-        listOf(InfoCommand(applicationInfo.name, applicationInfo.description))
+        listOf(InfoCommand(applicationInfo.name, applicationInfo.description), ConnectCommand())
 
     client
         .on(ReadyEvent::class.java)
@@ -83,7 +96,6 @@ class Landau : CliktCommand() {
     client
         .eventDispatcher
         .on(InteractionCreateEvent::class.java)
-        .doOnNext { event -> logger.debug { "Received interaction ${event.commandName}" } }
         .flatMap { event ->
           val command = commands[event.commandId.asLong()]
           command?.let {

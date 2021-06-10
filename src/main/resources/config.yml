@@ -3,7 +3,14 @@ bot:
     global:
       info:
         enabled: false
+      connect:
+        enabled: false
     guilds:
       624931933758947335:
         info:
           enabled: true
+        connect:
+          enabled: true
+database:
+  jdbcUrl: jdbc:postgresql://landau-db:5432/landau
+  driver: org.postgresql.Driver
