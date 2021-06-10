@@ -1,7 +1,7 @@
 package de.tobi6112.landau.service
 
+import de.tobi6112.landau.app.core.command.AbstractCommand
 import de.tobi6112.landau.config.CommandsConfig
-import de.tobi6112.landau.domain.core.command.AbstractCommand
 import discord4j.core.`object`.entity.ApplicationInfo
 import discord4j.rest.service.ApplicationService
 import mu.KotlinLogging

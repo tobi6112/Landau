@@ -1,4 +1,4 @@
-package de.tobi6112.landau.domain.core.command
+package de.tobi6112.landau.app.core.command
 
 import discord4j.core.event.domain.InteractionCreateEvent
 import discord4j.discordjson.json.ApplicationCommandRequest

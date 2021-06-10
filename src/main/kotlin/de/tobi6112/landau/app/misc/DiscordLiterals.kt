@@ -1,4 +1,4 @@
-package de.tobi6112.landau.domain.misc
+package de.tobi6112.landau.app.misc
 
 /**
  * Discord literals
