@@ -1,9 +1,9 @@
-package de.tobi6112.landau.domain.command
+package de.tobi6112.landau.domain.info
 
-import de.tobi6112.landau.domain.command.core.AbstractCommand
-import de.tobi6112.landau.domain.command.core.Choice
-import de.tobi6112.landau.domain.command.core.Option
-import de.tobi6112.landau.domain.command.core.OptionType
+import de.tobi6112.landau.domain.core.command.AbstractCommand
+import de.tobi6112.landau.domain.core.command.Choice
+import de.tobi6112.landau.domain.core.command.Option
+import de.tobi6112.landau.domain.core.command.OptionType
 import de.tobi6112.landau.domain.misc.DiscordLiterals
 import de.tobi6112.landau.domain.misc.Emoji
 import de.tobi6112.landau.util.DefaultPerformanceMonitor
