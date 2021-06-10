@@ -1,0 +1,20 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+group 'de.tobi6112'
+version '0.1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    hopliteVersion = '1.4.1'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "com.sksamuel.hoplite:hoplite-core:$hopliteVersion"
+    runtimeOnly "com.sksamuel.hoplite:hoplite-yaml:$hopliteVersion"
+}

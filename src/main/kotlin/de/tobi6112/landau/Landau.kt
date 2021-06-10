@@ -4,20 +4,16 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
-import de.tobi6112.landau.app.connect.ConnectCommand
-import de.tobi6112.landau.app.connect.ServiceConnectionTable
-import de.tobi6112.landau.app.core.command.AbstractCommand
-import de.tobi6112.landau.app.info.InfoCommand
-import de.tobi6112.landau.config.Configuration
-import de.tobi6112.landau.service.ApplicationCommandService
+import de.tobi6112.landau.command.Command
+import de.tobi6112.landau.command.core.AbstractCommand
+import de.tobi6112.landau.command.service.ApplicationCommandService
+import de.tobi6112.landau.core.config.Configuration
+import de.tobi6112.landau.data.Database
 import discord4j.core.DiscordClient
 import discord4j.core.event.domain.InteractionCreateEvent
 import discord4j.core.event.domain.lifecycle.ReadyEvent
 import discord4j.rest.util.AllowedMentions
 import mu.KotlinLogging
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.transaction
 import reactor.core.publisher.Mono
 
 import kotlin.system.exitProcess
@@ -45,8 +41,6 @@ class Landau : CliktCommand() {
         user = config.database.username,
         password = config.database.password)
 
-    transaction { SchemaUtils.createMissingTablesAndColumns(ServiceConnectionTable) }
-
     val client =
         DiscordClient.builder(token)
             .setDefaultAllowedMentions(AllowedMentions.suppressEveryone())
@@ -67,8 +61,7 @@ class Landau : CliktCommand() {
             .block()
 
     // TODO temporary solution
-    val applicationCommands: Iterable<AbstractCommand> =
-        listOf(InfoCommand(applicationInfo.name, applicationInfo.description), ConnectCommand())
+    val applicationCommands = Command.getAllCommands()
 
     client
         .on(ReadyEvent::class.java)
