@@ -33,11 +33,27 @@ data class CommandsConfig(val global: GlobalCommandsConfig, val guilds: GuildsCo
 data class BotConfig(val commands: CommandsConfig)
 
 /**
+ * Database config schema
+ *
+ * @property jdbcUrl JDBC URL
+ * @property driver Driver class
+ * @property username username
+ * @property password password
+ */
+data class DatabaseConfig(
+    val jdbcUrl: String,
+    val driver: String,
+    val username: String,
+    val password: String
+)
+
+/**
  * Config schema
  *
  * @property bot Bot configuration
+ * @property database
  */
-data class Config(val bot: BotConfig)
+data class Config(val bot: BotConfig, val database: DatabaseConfig)
 
 /** Configuration object, used to retrieve configuration file */
 object Configuration {
@@ -48,10 +64,10 @@ object Configuration {
    * @return Config
    */
   fun getConfig(env: String?): Config {
-    val file = env?.let { "/config-$env.yml" } ?: run { "/config.yml" }
     return ConfigLoader.Builder()
         .addSource(EnvironmentVariablesPropertySource(true, allowUppercaseNames = true))
-        .addSource(PropertySource.resource(file))
+        .addSource(PropertySource.resource("/config-$env.yml"))
+        .addSource(PropertySource.resource("/config.yml"))
         .build()
         .loadConfigOrThrow()
   }

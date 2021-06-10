@@ -1,0 +1,2 @@
+database:
+  jdbcUrl: jdbc:postgresql://localhost:5432/landau

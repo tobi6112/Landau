@@ -6,3 +6,15 @@ services:
     container_name: landau
     env_file:
       - ../../../.env
+  landau-db:
+    image: postgres:latest
+    container_name: landau-db
+    volumes:
+      - landau-db-data:/var/lib/postgresql/data
+    env_file:
+      - ../../../.env
+    ports:
+      - 5432:5432
+
+volumes:
+  landau-db-data:
