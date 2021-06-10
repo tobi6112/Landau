@@ -1,6 +1,6 @@
 /** Contains Repository */
 
-package de.tobi6112.landau.domain.connect
+package de.tobi6112.landau.app.connect
 
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
