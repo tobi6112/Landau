@@ -4,11 +4,11 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.associate
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
+import de.tobi6112.landau.app.connect.ConnectCommand
+import de.tobi6112.landau.app.connect.ServiceConnectionTable
+import de.tobi6112.landau.app.core.command.AbstractCommand
+import de.tobi6112.landau.app.info.InfoCommand
 import de.tobi6112.landau.config.Configuration
-import de.tobi6112.landau.domain.connect.ConnectCommand
-import de.tobi6112.landau.domain.connect.ServiceConnectionTable
-import de.tobi6112.landau.domain.core.command.AbstractCommand
-import de.tobi6112.landau.domain.info.InfoCommand
 import de.tobi6112.landau.service.ApplicationCommandService
 import discord4j.core.DiscordClient
 import discord4j.core.event.domain.InteractionCreateEvent

@@ -1,8 +1,8 @@
 /** Contains entity and database schema */
 
-package de.tobi6112.landau.domain.connect
+package de.tobi6112.landau.app.connect
 
-import de.tobi6112.landau.domain.core.data.AbstractEntity
+import de.tobi6112.landau.app.core.data.AbstractEntity
 import org.jetbrains.exposed.dao.id.UUIDTable
 
 /** Table schema for a service connection */

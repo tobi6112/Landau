@@ -1,4 +1,4 @@
-package de.tobi6112.landau.domain.connect
+package de.tobi6112.landau.app.connect
 
 /**
  * Services that are supported for connection

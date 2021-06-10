@@ -1,4 +1,4 @@
-package de.tobi6112.landau.domain.misc
+package de.tobi6112.landau.app.misc
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe

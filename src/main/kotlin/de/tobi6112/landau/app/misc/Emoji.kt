@@ -1,4 +1,4 @@
-package de.tobi6112.landau.domain.misc
+package de.tobi6112.landau.app.misc
 
 /**
  * Represents emojis
@@ -15,6 +15,9 @@ enum class Emoji(private val notation: String) {
   GEAR("gear"),
   ROCKET("rocket"),
   PARTYING_FACE("partying_face"),
+  RED_CROSS("x"),
+  WHITE_CHECK_MARK("white_check_mark"),
+  WARNING("warning"),
   ;
 
   private fun toDiscordNotation() = DiscordLiterals.EMOJI_LITERAL.buildLiteral(this.notation)
