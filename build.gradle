@@ -27,7 +27,7 @@ ext {
   junitVersion = '5.7.2'
   kotlinVersion = '1.5.10'
   kotestVersion = '4.6.0'
-  exposedVersion = '0.31.1'
+  exposedVersion = '0.32.1'
   fuelVersion = '2.3.1'
 }
 
