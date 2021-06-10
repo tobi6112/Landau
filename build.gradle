@@ -7,11 +7,12 @@ plugins {
   id "com.avast.gradle.docker-compose" version "0.14.3"
 }
 
-import com.bmuschko.gradle.docker.tasks.image.Dockerfile
-import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
-import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
-import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
+
 import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 
 group = 'de.tobi6112'
 
@@ -27,29 +28,25 @@ ext {
   junitVersion = '5.7.2'
   kotlinVersion = '1.5.10'
   kotestVersion = '4.6.0'
-  exposedVersion = '0.32.1'
   fuelVersion = '2.3.1'
+  slf4jVersion = '1.7.30'
 }
 
 dependencies {
+  implementation project(":landau-core")
+  implementation project(":landau-command")
+  implementation project(":landau-data")
+
   implementation 'com.github.ajalt.clikt:clikt:3.2.0'
   implementation "com.discord4j:discord4j-core:$discord4jVersion"
-  implementation 'io.github.microutils:kotlin-logging-jvm:2.0.8'
-  implementation "com.sksamuel.hoplite:hoplite-core:$hopliteVersion"
   implementation 'io.projectreactor:reactor-tools'
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-  implementation "org.jetbrains.exposed:exposed-core:$exposedVersion"
-  implementation "org.jetbrains.exposed:exposed-dao:$exposedVersion"
-  implementation "org.jetbrains.exposed:exposed-jdbc:$exposedVersion"
-  implementation "com.github.kittinunf.fuel:fuel:$fuelVersion"
-  implementation "com.github.kittinunf.fuel:fuel-json:$fuelVersion"
-  implementation "com.github.kittinunf.fuel:fuel-reactor:$fuelVersion"
+  implementation 'io.github.microutils:kotlin-logging-jvm:2.0.8'
+
 
   runtimeOnly "org.slf4j:slf4j-api:$slf4jVersion"
   runtimeOnly "org.slf4j:slf4j-simple:$slf4jVersion"
-  runtimeOnly "com.sksamuel.hoplite:hoplite-yaml:$hopliteVersion"
-  runtimeOnly "org.postgresql:postgresql:42.2.20"
 
 
   testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
