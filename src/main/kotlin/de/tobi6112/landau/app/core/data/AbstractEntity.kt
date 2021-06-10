@@ -1,4 +1,4 @@
-package de.tobi6112.landau.domain.core.data
+package de.tobi6112.landau.app.core.data
 
 import java.util.*
 

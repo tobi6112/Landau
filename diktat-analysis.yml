@@ -26,3 +26,5 @@
   enabled: false
 - name: WRONG_NEWLINES
   enabled: false
+- name: INLINE_CLASS_CAN_BE_USED
+  enabled: false
