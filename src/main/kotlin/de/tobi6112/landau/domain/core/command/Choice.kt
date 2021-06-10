@@ -1,4 +1,4 @@
-package de.tobi6112.landau.domain.command.core
+package de.tobi6112.landau.domain.core.command
 
 import discord4j.discordjson.json.ApplicationCommandOptionChoiceData
 
@@ -22,6 +22,5 @@ class Choice(private val name: String, private val value: String) {
    * @return data schema
    */
   fun toData(): ApplicationCommandOptionChoiceData =
-      ApplicationCommandOptionChoiceData.builder().name(name).value(value)
-          .build()
+      ApplicationCommandOptionChoiceData.builder().name(name).value(value).build()
 }
