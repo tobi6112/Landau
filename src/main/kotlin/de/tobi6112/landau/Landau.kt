@@ -91,21 +91,23 @@ class Landau : CliktCommand() {
         .on(InteractionCreateEvent::class.java)
         .flatMap { event ->
           val command = commands[event.commandId.asLong()]
-          command?.let {
-            return@flatMap command.handleEvent(event)
-          }
+          command
               ?: run {
                 logger.debug {
                   "No command with ID ${event.commandId.asLong()} (name: ${event.commandName}) found"
                 }
                 return@flatMap Mono.empty()
               }
+          return@flatMap command.handleEvent(event)
         }
         .subscribe()
 
     client.onDisconnect().block()
     logger.info { "Shutting down..." }
     exitProcess(0)
+  }
+
+  private fun connectWithDatabase() {
   }
 }
 
