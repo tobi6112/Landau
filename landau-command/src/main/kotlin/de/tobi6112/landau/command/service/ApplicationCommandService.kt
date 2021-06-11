@@ -109,7 +109,7 @@ class ApplicationCommandService(
         /*val data = it.t1.toData(applicationId, it.t2.id().toLong())
         needsUpdate(data, it.t2)*/
         //TODO Check if update is required
-        true
+        false
       }
       .doOnSuccess { logger.debug { "Update for guild command ${command.name} required" } }
       .flatMap {
@@ -134,7 +134,7 @@ class ApplicationCommandService(
         /*val data = it.t1.toData(applicationId, it.t2.id().toLong())
         needsUpdate(data, it.t2)*/
         //TODO Check if update is required
-        true
+        false
       }
       .doOnSuccess { logger.debug { "Update for command ${command.name} required" } }
       .flatMap {
