@@ -31,7 +31,7 @@ object LandauModule {
       val applicationInfo: ApplicationInfo = get()
       val config: Config = get()
       return@single ApplicationCommandService(
-          applicationId = applicationInfo.applicationId, get(), config.bot.commands)
+          applicationId = applicationInfo.applicationId, get(), config.bot.commands, get(), get())
     } bind ApplicationCommandService::class
   }
 }

@@ -10,13 +10,13 @@ import de.tobi6112.landau.command.core.AbstractCommand
 import de.tobi6112.landau.command.service.ApplicationCommandService
 import de.tobi6112.landau.core.config.Config
 import de.tobi6112.landau.data.Database
+import de.tobi6112.landau.data.DatabaseModule
 import de.tobi6112.landau.discord.ApplicationInfo
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.InteractionCreateEvent
 import discord4j.core.event.domain.lifecycle.ReadyEvent
 import mu.KotlinLogging
 import org.koin.core.context.startKoin
-import org.koin.dsl.module
 import org.koin.environmentProperties
 import org.koin.java.KoinJavaComponent.getKoin
 import org.koin.java.KoinJavaComponent.inject
@@ -36,7 +36,7 @@ class Landau : CliktCommand() {
       .default("")
   private val systemProperties: Map<String, String> by option("-D").associate()
 
-  @Suppress("MAGIC_NUMBER")
+  @Suppress("MAGIC_NUMBER", "LOCAL_VARIABLE_EARLY_DECLARATION")
   override fun run() {
     // Set system properties
     systemProperties.entries.forEach { System.setProperty(it.key, it.value) }
@@ -45,15 +45,21 @@ class Landau : CliktCommand() {
       slf4jLogger()
       environmentProperties()
       properties(mapOf("BOT_TOKEN" to token, "CONFIG_PROFILE" to configEnv))
-      modules(CommandModule.module, LandauModule.module)
+      modules(CommandModule.module, LandauModule.module, DatabaseModule.module)
     }
 
     val config: Config by inject(Config::class.java)
     val client: GatewayDiscordClient by inject(GatewayDiscordClient::class.java)
     val applicationInfo by inject<ApplicationInfo>(ApplicationInfo::class.java)
-    val applicationCommands: List<AbstractCommand> by lazy { getKoin().getAll() }
+    val applicationCommands: List<AbstractCommand> by lazy {
+      getKoin().getAll<AbstractCommand>().distinct()
+    }
     val applicationCommandService: ApplicationCommandService by inject(
         ApplicationCommandService::class.java)
+
+    require(applicationCommands.groupBy { it.name.trim() }.filter { it.value.size > 1 }.isEmpty()) {
+      "It is not possible to register multiple commands with the same name"
+    }
 
     Database.connect(
         url = config.database.jdbcUrl,
@@ -68,16 +74,19 @@ class Landau : CliktCommand() {
 
     val commands: MutableMap<Long, AbstractCommand> = mutableMapOf()
 
-    applicationCommandService
-        .createCommands(applicationCommands)
-        .doOnNext {
-          if (commands.containsKey(it.first)) {
-            logger.warn { "Command with id ${it.first} already exist" }
-          } else {
-            commands[it.first] = it.second
-          }
-        }
-        .subscribe()
+    applicationCommandService.processGlobalCommands(applicationCommands)
+    applicationCommandService.processGuildCommands(applicationCommands)
+
+    /* applicationCommandService
+    .createCommands(applicationCommands)
+    .doOnNext {
+      if (commands.containsKey(it.first)) {
+        logger.warn { "Command with id ${it.first} already exist" }
+      } else {
+        commands[it.first] = it.second
+      }
+    }
+    .subscribe()*/
 
     // Listen for Interaction events
     client

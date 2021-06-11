@@ -9,6 +9,6 @@ import org.koin.dsl.module
 object CommandModule {
   val module = module {
     single { InfoCommand() } bind AbstractCommand::class
-    single { ConnectCommand() } bind AbstractCommand::class
+    single { ConnectCommand(get()) } bind AbstractCommand::class
   }
 }

@@ -1,6 +1,7 @@
 package de.tobi6112.landau.data
 
-import de.tobi6112.landau.core.config.Configuration
+import de.tobi6112.landau.data.command.GlobalCommandTable
+import de.tobi6112.landau.data.command.GuildCommandTable
 import de.tobi6112.landau.data.connect.ServiceConnectionTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -15,7 +16,7 @@ object Database {
       password = password)
 
     transaction {
-      SchemaUtils.createMissingTablesAndColumns(ServiceConnectionTable)
+      SchemaUtils.createMissingTablesAndColumns(ServiceConnectionTable, GlobalCommandTable, GuildCommandTable)
     }
   }
 }

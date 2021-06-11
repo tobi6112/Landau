@@ -3,6 +3,7 @@ package de.tobi6112.landau.command.core
 import discord4j.core.`object`.command.ApplicationCommandInteraction
 import discord4j.core.`object`.command.ApplicationCommandInteractionOptionValue
 import discord4j.core.event.domain.InteractionCreateEvent
+import discord4j.discordjson.json.ApplicationCommandData
 import discord4j.discordjson.json.ApplicationCommandRequest
 import reactor.core.publisher.Mono
 
@@ -38,9 +39,9 @@ abstract class AbstractCommand(
   abstract fun handleEvent(event: InteractionCreateEvent): Mono<*>
 
   /**
-   * Convert to Data schema
+   * Convert to request schema
    *
-   * @return data schema
+   * @return request schema
    */
   fun toRequest(): ApplicationCommandRequest {
     val builder = ApplicationCommandRequest.builder().name(name).description(description)
@@ -49,6 +50,24 @@ abstract class AbstractCommand(
       builder.addAllOptions(options.map { it.toData() })
     }
 
+    return builder.build()
+  }
+
+  /**
+   * Convert to Data schema
+   *
+   * @return data schema
+   */
+  fun toData(applicationId: Long, commandId: Long): ApplicationCommandData {
+    val builder = ApplicationCommandData.builder()
+      .name(this.name)
+      .description(this.description)
+      .applicationId(applicationId.toString())
+      .id(commandId.toString())
+      .defaultPermission(true)
+    if(options.isNotEmpty()) {
+      builder.addAllOptions(options.map { it.toData() })
+    }
     return builder.build()
   }
 

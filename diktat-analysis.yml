@@ -28,3 +28,6 @@
   enabled: false
 - name: INLINE_CLASS_CAN_BE_USED
   enabled: false
+
+- name: COMMENTED_OUT_CODE
+  enabled: false

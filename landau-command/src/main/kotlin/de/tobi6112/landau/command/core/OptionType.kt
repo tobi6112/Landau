@@ -19,8 +19,12 @@ enum class OptionType(val value: Int) {
 
   companion object {
     fun fromApplicationCommandOptionType(optionType: ApplicationCommandOptionType): OptionType {
-      return OptionType.values().find { it.value == optionType.value }
-        ?: throw RuntimeException("No OptionType for value ${optionType.value} present")
+      return fromValue(optionType.value)
+    }
+
+    fun fromValue(value: Int): OptionType {
+      return values().find { it.value == value }
+        ?: throw RuntimeException("No OptionType for value $value present")
     }
   }
 }
