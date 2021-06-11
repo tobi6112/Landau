@@ -1,10 +1,7 @@
 package de.tobi6112.landau.command.commands.connect
 
 import de.tobi6112.landau.command.commands.connect.service.CodewarsServiceClient
-import de.tobi6112.landau.command.core.AbstractCommand
-import de.tobi6112.landau.command.core.Choice
-import de.tobi6112.landau.command.core.Option
-import de.tobi6112.landau.command.core.OptionType
+import de.tobi6112.landau.command.core.*
 import de.tobi6112.landau.core.connect.Service
 import de.tobi6112.landau.core.connect.ServiceConnection
 import de.tobi6112.landau.core.misc.Emoji
@@ -47,30 +44,30 @@ class ConnectCommand(
     val commandInteraction = event.interaction.commandInteraction
     val userId = getUserId(event)
 
-    val service = getServiceChoice(commandInteraction).block()
-    val identifier = getServiceIdentifier(commandInteraction).block()
-
-    if (connectionRepository.isUserAlreadyConnected(userId, service)) {
-      return event.reply { it.setContent("${Emoji.WARNING} You are already connected") }
-    }
-    if (connectionRepository.isIdentifierAlreadyTaken(service, identifier)) {
-      return event.reply { it.setContent("${Emoji.WARNING} Identifier is already taken") }
-    }
-
-    return this.isValidServiceIdentifier(service, identifier).flatMap { valid ->
-      if (valid) {
-        Mono.just(ServiceConnection(userId, service, identifier))
-            .map { connectionRepository.saveServiceConnection(it) }
-            .doOnError { log.error("${Emoji.RED_CROSS} Couldn't save connection", it) }
-            .flatMap { _ ->
-              event.reply { it.setContent("${Emoji.WHITE_CHECK_MARK} Successfully connected") }
+    return Mono.zip(getServiceChoice(commandInteraction), getServiceIdentifier(commandInteraction))
+      .doOnError(CommandException::class.java) { log.error(it) { "Error parsing options" } }
+      .flatMap {
+        if(connectionRepository.isUserAlreadyConnected(userId, it.t1)) {
+          return@flatMap event.reply { reply -> reply.setContent("${Emoji.WARNING} You are already connected") }
+        }
+        if(connectionRepository.isIdentifierAlreadyTaken(it.t1, it.t2)) {
+          return@flatMap event.reply { reply -> reply.setContent("${Emoji.WARNING} Identifier is already taken") }
+        }
+        return@flatMap this.isValidServiceIdentifier(it.t1, it.t2).flatMap { valid ->
+          if (valid) {
+            Mono.just(ServiceConnection(userId, it.t1, it.t2))
+              .map { serviceCon -> connectionRepository.saveServiceConnection(serviceCon) }
+              .doOnError { err -> log.error(err) { "${Emoji.RED_CROSS} Couldn't save connection" } }
+              .flatMap { _ ->
+                event.reply { reply -> reply.setContent("${Emoji.WHITE_CHECK_MARK} Successfully connected") }
+              }
+          } else {
+            event.reply { reply ->
+              reply.setContent("${Emoji.RED_CROSS} Not a valid identifier. Does not exist.")
             }
-      } else {
-        event.reply { reply ->
-          reply.setContent("${Emoji.RED_CROSS} Not a valid identifier. Does not exist.")
+          }
         }
       }
-    }
   }
 
   private fun getUserId(event: InteractionCreateEvent): Long = event.interaction.user.id.asLong()

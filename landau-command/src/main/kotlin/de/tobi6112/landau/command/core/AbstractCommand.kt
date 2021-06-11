@@ -57,7 +57,8 @@ abstract class AbstractCommand(
    *
    * @param interaction interaction
    * @param name name
-   * @return Tuple with Type and value or empty if no value present
+   * @return Tuple with Type and value
+   * @throws InvalidOptionException if option does not exist
    */
   private fun getOptionValueFromInteraction(interaction: ApplicationCommandInteraction,
                                              name: String): Mono<Pair<OptionType, ApplicationCommandInteractionOptionValue>> {
@@ -68,7 +69,7 @@ abstract class AbstractCommand(
         val type = OptionType.fromApplicationCommandOptionType(it.type)
         val value = it.value
         if(value.isEmpty) {
-          return@flatMap Mono.empty()
+          return@flatMap Mono.error(InvalidOptionException("Option $name does not exist"))
         }
         return@flatMap Mono.just(Pair(type, value.get()))
       }
@@ -92,13 +93,14 @@ abstract class AbstractCommand(
    * @param name name of the option
    * @param transform mapping function to transform string result
    * @return value or empty if no value present
+   * @throws OptionTypeMismatchException if option type is not string
    */
   fun <T> getOptionValueFromInteractionAsString(interaction: ApplicationCommandInteraction, name: String, transform: (String) -> T) : Mono<T> {
     return this.getOptionValueFromInteraction(interaction, name)
       .flatMap {
         when(it.first) {
           OptionType.STRING -> Mono.just(it.second.asString())
-          else -> Mono.error(RuntimeException("Option not applicable as String"))
+          else -> Mono.error(OptionTypeMismatchException("Option not applicable as String"))
         }
       }.map { transform(it) }
   }
