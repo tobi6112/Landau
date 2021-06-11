@@ -86,6 +86,7 @@ class Landau : CliktCommand() {
         }
         .subscribe()
 
+    // Listen for Interaction events
     client
         .eventDispatcher
         .on(InteractionCreateEvent::class.java)
@@ -102,12 +103,10 @@ class Landau : CliktCommand() {
         }
         .subscribe()
 
+    // Shutdown on disconnect
     client.onDisconnect().block()
     logger.info { "Shutting down..." }
     exitProcess(0)
-  }
-
-  private fun connectWithDatabase() {
   }
 }
 
