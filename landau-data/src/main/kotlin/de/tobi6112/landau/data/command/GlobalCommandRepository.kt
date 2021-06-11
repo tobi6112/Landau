@@ -18,6 +18,8 @@ interface GlobalCommandRepository {
    */
   fun saveGlobalCommand(id: Long, name: String)
 
+  fun getAll(): Iterable<Pair<Long, String>>
+
   /**
    *
    *
@@ -42,6 +44,17 @@ class DefaultGlobalCommandRepository : GlobalCommandRepository {
         it[commandId] = id
         it[commandName] = name
       }
+    }
+  }
+
+  override fun getAll(): Iterable<Pair<Long, String>> {
+    return transaction {
+      addLogger(Slf4jSqlDebugLogger)
+
+      GlobalCommandTable.selectAll()
+        .map {
+          it[GlobalCommandTable.commandId] to it[GlobalCommandTable.commandName]
+        }
     }
   }
 

@@ -25,6 +25,8 @@ interface GuildCommandRepository {
   fun findCommandIdsByNotInNameList(guildId: Long, names: Iterable<String>): Iterable<Long>
 
   fun removeCommandByCommandId(guildId: Long, id: Long)
+
+  fun getAll(): Iterable<Pair<Long, String>>
 }
 
 class DefaultGuildCommandRepository : GuildCommandRepository {
@@ -84,6 +86,17 @@ class DefaultGuildCommandRepository : GuildCommandRepository {
       GuildCommandTable.deleteWhere {
         (GuildCommandTable.guildId eq guildId) and (GuildCommandTable.commandId eq id)
       }
+    }
+  }
+
+  override fun getAll(): Iterable<Pair<Long, String>> {
+    return transaction {
+      addLogger(Slf4jSqlDebugLogger)
+
+      GuildCommandTable.selectAll()
+        .map {
+          it[GuildCommandTable.commandId] to it[GuildCommandTable.commandName]
+        }
     }
   }
 }

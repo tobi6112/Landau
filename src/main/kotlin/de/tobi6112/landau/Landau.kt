@@ -11,6 +11,8 @@ import de.tobi6112.landau.command.service.ApplicationCommandService
 import de.tobi6112.landau.core.config.Config
 import de.tobi6112.landau.data.Database
 import de.tobi6112.landau.data.DatabaseModule
+import de.tobi6112.landau.data.command.GlobalCommandRepository
+import de.tobi6112.landau.data.command.GuildCommandRepository
 import de.tobi6112.landau.discord.ApplicationInfo
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.InteractionCreateEvent
@@ -56,6 +58,9 @@ class Landau : CliktCommand() {
     }
     val applicationCommandService: ApplicationCommandService by inject(
         ApplicationCommandService::class.java)
+    val guildCommandRepository: GuildCommandRepository by inject(GuildCommandRepository::class.java)
+    val globalCommandRepository: GlobalCommandRepository by inject(
+        GlobalCommandRepository::class.java)
 
     require(applicationCommands.groupBy { it.name.trim() }.filter { it.value.size > 1 }.isEmpty()) {
       "It is not possible to register multiple commands with the same name"
@@ -88,20 +93,23 @@ class Landau : CliktCommand() {
     }
     .subscribe()*/
 
+    val allCommands = guildCommandRepository.getAll().plus(globalCommandRepository.getAll())
+
     // Listen for Interaction events
     client
         .eventDispatcher
         .on(InteractionCreateEvent::class.java)
         .flatMap { event ->
-          val command = commands[event.commandId.asLong()]
-          command
+          val command = allCommands.find { it.first == event.commandId.asLong() }
+          command?.let { cmd ->
+            return@flatMap applicationCommands.find { it.name == cmd.second }!!.handleEvent(event)
+          }
               ?: run {
                 logger.debug {
                   "No command with ID ${event.commandId.asLong()} (name: ${event.commandName}) found"
                 }
                 return@flatMap Mono.empty()
               }
-          return@flatMap command.handleEvent(event)
         }
         .subscribe()
 

@@ -111,7 +111,7 @@ class ApplicationCommandService(
         //TODO Check if update is required
         false
       }
-      .doOnSuccess { logger.debug { "Update for guild command ${command.name} required" } }
+      .doOnNext { logger.debug { "Update for guild command ${command.name} required" } }
       .flatMap {
         val id = this.guildCommandRepository.findCommandIdByName(guildId, it.t1.name)!!
         return@flatMap this.updateGuildCommand(guildId, id, it.t1)
@@ -136,7 +136,7 @@ class ApplicationCommandService(
         //TODO Check if update is required
         false
       }
-      .doOnSuccess { logger.debug { "Update for command ${command.name} required" } }
+      .doOnNext { logger.debug { "Update for command ${command.name} required" } }
       .flatMap {
         val id = this.globalCommandRepository.findCommandIdByName(it.t1.name)!!
         return@flatMap this.updateGlobalCommand(id, it.t1)
