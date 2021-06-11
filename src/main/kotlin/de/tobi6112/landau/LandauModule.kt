@@ -11,14 +11,17 @@ import discord4j.rest.util.AllowedMentions
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
+/** Contains Koin Module */
 object LandauModule {
   val module = module {
     single { Configuration.getConfig(getProperty("CONFIG_PROFILE")) }
-    single { DiscordClient.builder(getProperty("BOT_TOKEN"))
-      .setDefaultAllowedMentions(AllowedMentions.suppressEveryone())
-      .build()
-      .login()
-      .block() } bind GatewayDiscordClient::class
+    single {
+      DiscordClient.builder(getProperty("BOT_TOKEN"))
+          .setDefaultAllowedMentions(AllowedMentions.suppressEveryone())
+          .build()
+          .login()
+          .block()
+    } bind GatewayDiscordClient::class
     single { ApplicationInfo(get()) }
     single {
       val client: GatewayDiscordClient = get()
@@ -27,7 +30,8 @@ object LandauModule {
     single {
       val applicationInfo: ApplicationInfo = get()
       val config: Config = get()
-      return@single ApplicationCommandService(applicationId = applicationInfo.applicationId, get(), config.bot.commands)
+      return@single ApplicationCommandService(
+          applicationId = applicationInfo.applicationId, get(), config.bot.commands)
     } bind ApplicationCommandService::class
   }
 }

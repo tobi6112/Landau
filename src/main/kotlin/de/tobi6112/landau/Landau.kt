@@ -9,18 +9,13 @@ import de.tobi6112.landau.command.CommandModule
 import de.tobi6112.landau.command.core.AbstractCommand
 import de.tobi6112.landau.command.service.ApplicationCommandService
 import de.tobi6112.landau.core.config.Config
-import de.tobi6112.landau.core.config.Configuration
 import de.tobi6112.landau.data.Database
 import de.tobi6112.landau.discord.ApplicationInfo
-import discord4j.core.DiscordClient
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.InteractionCreateEvent
 import discord4j.core.event.domain.lifecycle.ReadyEvent
-import discord4j.rest.service.ApplicationService
-import discord4j.rest.util.AllowedMentions
 import mu.KotlinLogging
 import org.koin.core.context.startKoin
-import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.environmentProperties
 import org.koin.java.KoinJavaComponent.getKoin
@@ -35,9 +30,10 @@ class Landau : CliktCommand() {
   private val logger = KotlinLogging.logger {}
 
   // CLI Options
-  private val token by option("-t", "--token", help = "Bot token", envvar = "BOT_TOKEN")
-      .required()
-  private val configEnv by option("-c", "--config", help = "Configuration environment", envvar = "CONFIG_PROFILE").default("")
+  private val token by option("-t", "--token", help = "Bot token", envvar = "BOT_TOKEN").required()
+  private val configEnv by option(
+      "-c", "--config", help = "Configuration environment", envvar = "CONFIG_PROFILE")
+      .default("")
   private val systemProperties: Map<String, String> by option("-D").associate()
 
   @Suppress("MAGIC_NUMBER")
@@ -53,16 +49,17 @@ class Landau : CliktCommand() {
     }
 
     val config: Config by inject(Config::class.java)
-    val client : GatewayDiscordClient by inject(GatewayDiscordClient::class.java)
+    val client: GatewayDiscordClient by inject(GatewayDiscordClient::class.java)
     val applicationInfo by inject<ApplicationInfo>(ApplicationInfo::class.java)
     val applicationCommands: List<AbstractCommand> by lazy { getKoin().getAll() }
-    val applicationCommandService: ApplicationCommandService by inject(ApplicationCommandService::class.java)
+    val applicationCommandService: ApplicationCommandService by inject(
+        ApplicationCommandService::class.java)
 
     Database.connect(
-      url = config.database.jdbcUrl,
-      driver = config.database.driver,
-      user = config.database.username,
-      password = config.database.password)
+        url = config.database.jdbcUrl,
+        driver = config.database.driver,
+        user = config.database.username,
+        password = config.database.password)
 
     client
         .on(ReadyEvent::class.java)
