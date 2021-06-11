@@ -2,7 +2,6 @@ package de.tobi6112.landau.command.service
 
 import de.tobi6112.landau.command.core.AbstractCommand
 import de.tobi6112.landau.core.config.CommandsConfig
-import discord4j.core.`object`.entity.ApplicationInfo
 import discord4j.rest.service.ApplicationService
 import mu.KotlinLogging
 import reactor.core.publisher.Flux
@@ -11,16 +10,16 @@ import reactor.core.publisher.Mono
 /**
  * Application command service
  *
- * @property applicationInfo application info
+ * @property applicationId application id
  * @property applicationService application service
+ * @property config config
  */
 class ApplicationCommandService(
-    private val applicationInfo: ApplicationInfo,
+    private val applicationId: Long,
     private val applicationService: ApplicationService,
     private val config: CommandsConfig
 ) {
   private val logger = KotlinLogging.logger {}
-  private val applicationId = applicationInfo.id.asLong()
 
   /**
    * Create commands and return their associated ID as well as the command
@@ -28,7 +27,7 @@ class ApplicationCommandService(
    * @param commands iterable of commands to create
    * @return reactive tuples of their associated id and the command
    */
-  fun createCommands(commands: Iterable<AbstractCommand>) =
+  fun createCommands(commands: Iterable<AbstractCommand>): Flux<Pair<Long, AbstractCommand>> =
       Flux.merge(
           this.createGlobalCommandsReactive(commands), this.createGuildCommandsReactive(commands))
 
@@ -60,7 +59,7 @@ class ApplicationCommandService(
           .map { cmd -> Pair(cmd.id().toLong(), commands.find { cmd.name() == it.name }!!) }
 
   private fun isGuildCommandEnabled(guildId: Long, command: AbstractCommand) =
-      Mono.just(config.guilds?.get(guildId)?.get(command.name)?.enabled ?: false)
+      Mono.just(config.guilds[guildId]?.get(command.name)?.enabled ?: false)
 
   private fun createGuildCommandReactive(guildId: Long, command: AbstractCommand) =
       this.applicationService
