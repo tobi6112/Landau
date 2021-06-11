@@ -1,5 +1,7 @@
 package de.tobi6112.landau.command.core
 
+import discord4j.rest.util.ApplicationCommandOptionType
+
 /** @property value */
 @Suppress("MAGIC_NUMBER")
 enum class OptionType(val value: Int) {
@@ -14,4 +16,11 @@ enum class OptionType(val value: Int) {
   ROLE(8),
   MENTIONABLE(9),
   ;
+
+  companion object {
+    fun fromApplicationCommandOptionType(optionType: ApplicationCommandOptionType): OptionType {
+      return OptionType.values().find { it.value == optionType.value }
+        ?: throw RuntimeException("No OptionType for value ${optionType.value} present")
+    }
+  }
 }

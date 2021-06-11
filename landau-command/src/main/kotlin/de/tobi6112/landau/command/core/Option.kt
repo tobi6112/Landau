@@ -12,8 +12,8 @@ import discord4j.discordjson.json.ApplicationCommandOptionData
  * @property choices Only supported when type is INT or STRING
  */
 class Option(
-  private val type: OptionType,
-  private val name: String,
+  val type: OptionType,
+  val name: String,
   private val description: String,
   private val required: Boolean = false,
   private val choices: List<Choice> = listOf()

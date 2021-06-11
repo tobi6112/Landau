@@ -10,6 +10,7 @@ import de.tobi6112.landau.core.connect.ServiceConnection
 import de.tobi6112.landau.core.misc.Emoji
 import de.tobi6112.landau.data.connect.DefaultServiceConnectionRepository
 import de.tobi6112.landau.data.connect.ServiceConnectionRepository
+import discord4j.core.`object`.command.ApplicationCommandInteraction
 import discord4j.core.event.domain.InteractionCreateEvent
 import mu.KotlinLogging
 import reactor.core.publisher.Mono
@@ -43,9 +44,11 @@ class ConnectCommand(
   private val codewarsService = CodewarsServiceClient()
 
   override fun handleEvent(event: InteractionCreateEvent): Mono<*> {
+    val commandInteraction = event.interaction.commandInteraction
     val userId = getUserId(event)
-    val service = getServiceChoice(event)
-    val identifier = getServiceIdentifier(event)
+
+    val service = getServiceChoice(commandInteraction).block()
+    val identifier = getServiceIdentifier(commandInteraction).block()
 
     if (connectionRepository.isUserAlreadyConnected(userId, service)) {
       return event.reply { it.setContent("${Emoji.WARNING} You are already connected") }
@@ -72,28 +75,14 @@ class ConnectCommand(
 
   private fun getUserId(event: InteractionCreateEvent): Long = event.interaction.user.id.asLong()
 
-  private fun getServiceChoice(event: InteractionCreateEvent): Service {
-    return Service.valueOf(
-        event
-            .interaction
-            .commandInteraction
-            .getOption("service")
-            .orElseThrow()
-            .value
-            .orElseThrow()
-            .asString()
-            .uppercase())
+  private fun getServiceChoice(interaction: ApplicationCommandInteraction): Mono<Service> {
+    return this.getOptionValueFromInteractionAsString(interaction, "service") {
+      Service.valueOf(it.uppercase())
+    }
   }
 
-  private fun getServiceIdentifier(event: InteractionCreateEvent): String {
-    return event
-        .interaction
-        .commandInteraction
-        .getOption("identifier")
-        .orElseThrow()
-        .value
-        .orElseThrow()
-        .asString()
+  private fun getServiceIdentifier(interaction: ApplicationCommandInteraction): Mono<String> {
+    return this.getOptionValueFromInteractionAsString(interaction, "identifier")
   }
 
   private fun isValidServiceIdentifier(service: Service, identifier: String): Mono<Boolean> {

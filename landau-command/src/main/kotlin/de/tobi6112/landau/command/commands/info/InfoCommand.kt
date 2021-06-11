@@ -50,30 +50,15 @@ class InfoCommand(
    */
   override fun handleEvent(event: InteractionCreateEvent): Mono<Void> {
     val interaction = event.interaction.commandInteraction
-    val optSubject = interaction.getOption("subject")
-    if (optSubject.isEmpty) {
-      logger.error { "Somehow subject is empty, this should not happen as it is required" }
-      return Mono.error(RuntimeException("subject is empty"))
-    }
-    val subject = optSubject.get()
 
-    val optValue = subject.value
-    if (optValue.isEmpty) {
-      logger.error { "Somehow subject value is empty, this should not happen" }
-      return Mono.error(RuntimeException("subject value is empty"))
-    }
-    val value = subject.value
-
-    if (subject.type.value != OptionType.STRING.value) {
-      logger.error { "Option Type is not a string, this should not happen" }
-      return Mono.error(RuntimeException("Option type is not a string"))
-    }
-
-    return when (value.get().asString()) {
-      "bot" -> getBotInfo(event)
-      "server" -> getServerInfo(event)
-      else -> Mono.error(RuntimeException("Unknown value ${value.get().asString()}"))
-    }
+    return this.getOptionValueFromInteractionAsString(interaction, "subject")
+      .flatMap {
+        when(it) {
+          "bot" -> getBotInfo(event)
+          "server" -> getServerInfo(event)
+          else -> Mono.error(RuntimeException("Unknown value $it"))
+        }
+      }
   }
 
   private fun getBotInfo(event: InteractionCreateEvent) =
