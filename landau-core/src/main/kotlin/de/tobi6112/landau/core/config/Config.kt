@@ -63,11 +63,15 @@ object Configuration {
    * @param env environment
    * @return Config
    */
-  fun getConfig(env: String?): Config {
-    return ConfigLoader.Builder()
+  fun getConfig(env: String): Config {
+    val builder = ConfigLoader.Builder()
         .addSource(EnvironmentVariablesPropertySource(true, allowUppercaseNames = true))
-        .addSource(PropertySource.resource("/config-$env.yml"))
-        .addSource(PropertySource.resource("/config.yml"))
+
+    if(env.isNotBlank()) {
+      builder.addSource(PropertySource.resource("/config-$env.yml"))
+    }
+
+    return builder.addSource(PropertySource.resource("/config.yml"))
         .build()
         .loadConfigOrThrow()
   }
