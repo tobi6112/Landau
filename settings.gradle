@@ -1,2 +1,4 @@
-
 rootProject.name = 'Landau'
+include 'landau-data'
+include 'landau-core'
+include 'landau-command'
