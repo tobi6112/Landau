@@ -10,7 +10,7 @@ repositories {
 }
 
 ext {
-    hopliteVersion = '1.4.1'
+    hopliteVersion = '1.4.2'
 }
 
 dependencies {
