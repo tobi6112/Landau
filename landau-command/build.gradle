@@ -12,7 +12,7 @@ repositories {
 ext {
     discord4jVersion = '3.1.5'
     fuelVersion = '2.3.1'
-    koin_version = '3.1.0'
+    koin_version = '3.1.1'
 }
 
 dependencies {
