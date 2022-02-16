@@ -11,7 +11,7 @@ repositories {
 
 ext {
     exposedVersion = '0.32.1'
-    postgresVersion = '42.2.20'
+    postgresVersion = '42.3.3'
     koin_version = '3.1.0'
 }
 
